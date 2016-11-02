@@ -7,6 +7,11 @@ int pf(char *s, char *buf)
 
     snprintf(name, 100, "/home/pf%s", s);
     pF = fopen(name,"w");
+    if (pF == NULL)
+    {
+        fprintf(stderr,"pf function cannot open file for writing result");
+        exit(1);
+    }
     fprintf(pF, "%s", buf);
     fclose(pF);
     return 0;

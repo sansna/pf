@@ -13,6 +13,7 @@ int main() {
   printf( "  long double: %d\n\n", sizeof(long double) ) ;
 
 
-  printf( "PRIu32 usage (see source): %"PRIu32"\n" , (uint32_t) 42 ) ;
+  printf( "PRIu32 usage (see source): %"PRIu32"\n\n" , (uint32_t) 42 ) ;
+  printf( "__WORDSIZE(fastest size)= %d\n", __WORDSIZE);
   return 0;
 }

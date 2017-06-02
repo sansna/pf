@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int main() {
     char *a = (char *)malloc(1);
@@ -23,6 +24,7 @@ int main() {
             b - a,
             d - c,
             f - e);
+    fprintf(stdout, "The paging size is %d bytes.\n\n", getpagesize());
 
     printf( "PRIu32 usage (see source): %"PRIu32"\n\n" , (uint32_t) 42 ) ;
     printf( "__WORDSIZE(fastest size)= %d\n", __WORDSIZE);

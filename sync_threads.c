@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#define MAX_TRY 50000000
+
 struct pdata {
 	int i;
 	pid_t pid;      //print by %d
@@ -29,6 +31,33 @@ struct pdata {
 int a = 0;
 pthread_mutex_t mutex;
 
+//Current best version of thread synchronization method.
+void *foo~(void *args)
+{
+	struct pdata *data = (struct pdata *)args;
+	int i = 0;
+	data->pid = getpid();
+	data->tid = syscall(SYS_gettid);
+	data->ptid = pthread_self();
+
+	while (a < MAX_TRY) {
+		__sync_fetch_and_add (&a, 1);
+		if (unlikely(a > MAX_TRY)) {
+			__sync_fetch_and_sub (&a, 1);
+			break;
+		}
+		if (unlikely(a == MAX_TRY)) {
+			//Do something while finished.
+		}
+		i ++;
+	}
+
+	printf("from p%lu : a = %d\n", data->ptid, a);
+	printf("from p%lu : local i = %d\n", data->ptid, 1);
+	return (void *)data;
+}
+
+//Past version.
 void *foo(void *args)
 {
 	struct pdata *data = (struct pdata *)args;
@@ -36,6 +65,7 @@ void *foo(void *args)
 	data->pid = getpid();
 	data->tid = syscall(SYS_gettid);
 	data->ptid = pthread_self();
+
 	for (; i < 10000000; i ++) {
 		pthread_mutex_lock (&mutex);
 		a ++;
@@ -74,5 +104,6 @@ int main()
 	mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 	ss(5);
 	pthread_mutex_destroy(&mutex);
+	printf("atlast: %d\n", a);
 	return 0;
 }

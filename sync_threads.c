@@ -7,7 +7,7 @@
  * thread synchronization. Do not use it.
  *
  * And I have used this to test on my i7 core. Result seem to overwhelm the
- * Xeon's result by 10^2. (i7 6700 vs. Xeon5 2630 v4)
+ * Xeon's result by an order of magnitude. (i7 6700 vs. Xeon5 2630 v4)
  *
  */
 

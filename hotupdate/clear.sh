@@ -1,2 +1,2 @@
 #!/bin/bash
-rm *.o *.so ./test
+rm *.o *.so ./ikos_update_lib

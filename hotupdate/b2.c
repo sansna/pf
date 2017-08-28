@@ -6,7 +6,7 @@ int b (void)
 	return 0;
 }
 
-float libversion(void)
+float ikos_libversion(void)
 {
 	return 2.0;
 }

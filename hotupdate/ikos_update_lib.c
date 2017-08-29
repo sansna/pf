@@ -7,7 +7,7 @@
 
 #include <openssl/md5.h>
 
-#include "test.h"
+#include "ikos_update_lib.h"
 
 struct funcname_pointer {
 	char *name;

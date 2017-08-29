@@ -43,29 +43,40 @@ ik_update_lib__ (char *dbname, char *libname)
 	int len = 0;
 	int i = 0;
 	char buf[IK_MAX_BUF], *func_name = NULL;
+	char *pbuf;
 
 	fd = open(dbname, O_RDONLY);
-	len = read(fd, &buf, IK_MAX_BUF);
-	if (len == 0)
-		return;
-	for (func_name = strtok((char*)&buf, " "); 
-		 func_name != NULL;
-		 func_name = strtok(NULL, " ")) {
-		for (i = 0; i < IK_FUNC_COUNT; i ++) {
-			if (!strcmp(FUNCNAME_POINTER_const[i].name,func_name)) {
+
+	do{
+		len = read(fd, &buf, IK_MAX_BUF);
+		if (len == 0)
+			break;
+		while( NULL != (pbuf = strchr((const char*)&buf,'\n')) ) {
+			*pbuf = ' ';
+		}
+		for (func_name = strtok((char*)&buf, " "); 
+			 func_name != NULL;
+			 func_name = strtok(NULL, " ")) {
+			if ((func_name - buf) >= len) {
 				break;
 			}
+			for (i = 0; i < IK_FUNC_COUNT; i ++) {
+				if (!strcmp(FUNCNAME_POINTER_const[i].name,func_name)) {
+					break;
+				}
+			}
+			if (i == IK_FUNC_COUNT) {
+				sprintf((char*)&buf,
+						"ik_update_lib: db file corrupted at pos %d.\n",
+						i + 1);
+				perror((const char*)&buf);
+				break;
+			}
+			new_hdl = dlopen(libname,RTLD_LAZY);
+			*FUNCNAME_POINTER_const[i].pointer = dlsym(new_hdl,func_name);
 		}
-		if (i == IK_FUNC_COUNT) {
-			sprintf((char*)&buf,
-					"ik_update_lib: db file corrupted at pos %d.\n",
-				   	i + 1);
-			perror((const char*)&buf);
-			return;
-		}
-		new_hdl = dlopen(libname,RTLD_LAZY);
-		*FUNCNAME_POINTER_const[i].pointer = dlsym(new_hdl,func_name);
-	}
+	} while(0);
+
 	close(fd);
 }
 

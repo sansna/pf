@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+// The following inclusions are important.
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>

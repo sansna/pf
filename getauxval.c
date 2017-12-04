@@ -28,4 +28,8 @@ int main()
 	fprintf(stdout, "AT_SYSINFO_EHDR: %lx\n", getauxval(AT_SYSINFO_EHDR));
 	fprintf(stdout, "AT_UCACHEBSIZE: %lx\n", getauxval(AT_UCACHEBSIZE));
 	fprintf(stdout, "AT_UID: %lx\n", getauxval(AT_UID));
+
+	while(1);
+
+	return 0;
 }

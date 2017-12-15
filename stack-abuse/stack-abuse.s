@@ -1,6 +1,6 @@
-# Generated assembly from stack-overflow.c and is further modified
+# Generated assembly from stack-abuse.c and is further modified
 # to skip some instructions after function()
-	.file	"stack-overflow.c"
+	.file	"stack-abuse.c"
 	.text
 	.p2align 4,,15
 	.globl	function
@@ -15,7 +15,7 @@ function:
 # Let %rax denote address of return %rip address, 8 bytes before %rbp, 
 # because %rip is 8 bytes long.
 	leaq	8(%rbp),%rax
-# The value $119 is calculted from: objdump -S -j .text stack-overflow.out.
+# The value $119 is calculted from: objdump -S -j .text stack-abuse.out.
 	addq	$119,(%rax)
 	popq 	%rbp
 	ret
@@ -34,7 +34,7 @@ main:
 	.cfi_startproc
 	subq	$8, %rsp
 	.cfi_def_cfa_offset 16
-# This call step is also added, because the gcc -O2 -S stack-overflow.c step
+# This call step is also added, because the gcc -O2 -S stack-abuse.c step
 # removes calling of function.
 	call 	function
 # %rip in function points the next instruction in assembly.

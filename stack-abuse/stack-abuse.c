@@ -1,12 +1,12 @@
-/* stack-overflow.c: only work in -O0 mode.
+/* stack-abuse.c: only work in -O0 mode.
  * the %rip manipulation not work
  * in O2 mode.
  *
  * Further improvements (with generated assembly):
  * If need to generate O2-opt code:
- * first generate assembly in O2: gcc -S -O2 stack-overflow.c
- * then modify the assembly: vim stack-overflow.s
- * last gas the assembly to binary: gcc -O0 stack-overflow.s -o stack-overflow.out
+ * first generate assembly in O2: gcc -S -O2 stack-abuse.c
+ * then modify the assembly: vim stack-abuse.s
+ * last gas the assembly to binary: gcc -O0 stack-abuse.s -o stack-abuse.out
  */
 #include <stdio.h>
 

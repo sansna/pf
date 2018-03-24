@@ -1,6 +1,10 @@
 /* stack-abuse.c: only work in -O0 mode.
  * the %rip manipulation not work
  * in O2 mode.
+ * And to note in ubuntu version later than 6.10,
+ * the -fstack-protector is enabled default. Thus
+ * if need to compile on ubuntu, the *-fno-stack-protector*
+ * should be specified.
  *
  * Further improvements (with generated assembly):
  * If need to generate O2-opt code:

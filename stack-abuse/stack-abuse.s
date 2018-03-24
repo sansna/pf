@@ -77,7 +77,9 @@ main:
 	ret
 # The following is used to enlarge the target object file by 1M.
 # And fill the enlarged space with 1, default 0.
-	.org 1048576, 1
+	.space 1048576, 1
+# The following is used to relocate to the target object file offset 1M+9035+1024.
+	.org 1059136, 1
 	.cfi_endproc
 .LFE12:
 	.size	main, .-main

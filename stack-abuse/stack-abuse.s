@@ -75,6 +75,9 @@ main:
 	addq	$8, %rsp
 	.cfi_def_cfa_offset 8
 	ret
+# The following is used to enlarge the target object file by 1M.
+# And fill the enlarged space with 1, default 0.
+	.org 1048576, 1
 	.cfi_endproc
 .LFE12:
 	.size	main, .-main

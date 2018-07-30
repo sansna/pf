@@ -18,7 +18,7 @@ int main()
 	char *buf = malloc(sizeof(1000));
 	sock_ser->sin_family = AF_INET;
 	sock_ser->sin_port = htons(7777);
-	sock_ser->sin_addr.s_addr = inet_addr("127.0.0.1");
+	sock_ser->sin_addr.s_addr = INADDR_ANY;
 
 	if (-1 == (fd = socket( AF_INET, SOCK_STREAM, 0 )))
 		perror("Socket fd -1");

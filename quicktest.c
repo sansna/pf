@@ -12,6 +12,8 @@ int main() {
     char *f = (char *)malloc(1);
     printf( "    short int: %d\n" , sizeof(short int) ) ;
     printf( "          int: %d\n" , sizeof(int) ) ;
+	printf( "     unsigned: %d\n" , sizeof(unsigned) ) ;
+	printf( "         long: %d\n" , sizeof(long) ) ;
     printf( "     long int: %d\n", sizeof(long int) ) ;
     printf( "long long int: %d\n", sizeof(long long int) ) ;
     printf( "       size_t: %d\n", sizeof(size_t) ) ;

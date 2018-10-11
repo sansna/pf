@@ -13,6 +13,8 @@ struct lcore_conf {
     // can only write in fd[1] and read from fd[0]
     int master2slave[2];
     int slave2master[2];
+    void *(*slavefunc)(void *args);
+    void *args;
 };
 struct lcore_conf lcore_conf[MAX_CORES];
 

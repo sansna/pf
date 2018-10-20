@@ -15,6 +15,7 @@ int main()
 	int fd = -1, fd_in = -1;
 	int bytes = 0;
 	unsigned int size = sizeof(*sock_in);
+	struct linger lin;
 	char *buf = malloc(sizeof(1000));
 	sock_ser->sin_family = AF_INET;
 	sock_ser->sin_port = htons(7777);
@@ -28,6 +29,9 @@ int main()
 recon:
 	listen(fd, SOMAXCONN);
 	fd_in = accept(fd, (struct sockaddr *)sock_in, &size);
+	lin.l_linger = 0;
+	lin.l_onoff = 1;
+	setsockopt(fd_in, SOL_SOCKET, SO_LINGER, &lin,sizeof(lin));
 
 	fprintf(stdout, "Client connected: %s:%u\n", inet_ntoa(sock_in->sin_addr),
 			ntohs(sock_in->sin_port));
@@ -35,7 +39,7 @@ recon:
 	while (1) {
 		bytes = read(fd_in, (void *)buf, 1000);
 		if (bytes <= 0) {
-			close(fd_in);
+			//close(fd_in);
 			goto recon;
 		}
 		fprintf(stdout, "Bytes received: %u\n", bytes);

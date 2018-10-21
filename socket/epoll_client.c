@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <string.h>
 
-#define M 1000
+#define M 100
 pthread_t tid[M];
 void *pfunc(void *arg) {
 	struct sockaddr_in sock;
@@ -16,7 +16,7 @@ void *pfunc(void *arg) {
 	pthread_t ltid = pthread_self();
 	int i = 0;
 	char buf[20];
-	//fcntl(fd, F_SETFL, O_NONBLOCK);
+	fcntl(fd, F_SETFL, O_NONBLOCK);
 	inet_aton("127.0.0.1", &sock.sin_addr);
 	sock.sin_family = AF_INET;
 	sock.sin_port = htons(6666);
@@ -29,6 +29,10 @@ void *pfunc(void *arg) {
 	snprintf(buf, 20, "HelloWorld%d", i);
 	write(fd, buf, strlen(buf));
 	//fprintf(stdout,"%s\n", buf);
+
+	//XXX: When you close the fd, a fin is sent over to server
+	// and server side's epoll will prompt for EPOLLIN|EPOLLET event
+	// causing the further read() of 0 byte.
 	close(fd);
 	return NULL;
 }

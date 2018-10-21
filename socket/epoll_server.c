@@ -5,14 +5,31 @@
 #include <sys/epoll.h>
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>
 
 #define M 100
+#undef _DEBUG
 int do_with_fd(int fd) {
+	int count = 0;
 	char buf[20];
-	read(fd, buf, 20);
-	//usleep(100);
-	//write(fd, buf, strlen(buf));
-	fprintf(stdout, "%s\n", buf);
+	while (1) {
+		count = read(fd, buf, 20);
+		// This indicates a fin of the connection has arrived.
+		if (count == 0) {
+#ifdef _DEBUG
+			fprintf(stdout, "Zero buf\n");
+#endif
+			break;
+		}
+		// This indicates *no more* buffers can be read from fd.
+		if (count == -1 && errno == EAGAIN) {
+#ifdef _DEBUG
+			fprintf(stdout, "-1 buf\n");
+#endif
+			break;
+		}
+		fprintf(stdout, "%s length:%d\n", buf,count);
+	}
 	return 0;
 }
 
@@ -36,16 +53,26 @@ int main() {
 	while (1) {
 		nfds = epoll_wait(fde, evnts, M+1, 400);
 		for (i = 0; i < nfds; i++) {
+			if (evnts[i].events & EPOLLERR||
+				evnts[i].events & EPOLLHUP||
+				(!(evnts[i].events & EPOLLIN))) {
+				fprintf(stdout,"epoll error events:=%u\n", evnts[i].events);
+				close(evnts[i].data.fd);
+				continue;
+			}
 			if (evnts[i].data.fd == fd) {
 				fd_in = accept(fd, (struct sockaddr*)&sock_in, &size);
 				if (fd_in != -1) {
-					fcntl(fd_in, F_SETFL, O_NONBLOCK);
-					// prevents multiple invoke by EPOLLONESHOT
-					ev.events = EPOLLET|EPOLLIN|EPOLLONESHOT;
+					fcntl(fd_in, F_SETFL, fcntl(fd_in, F_GETFL) | O_NONBLOCK);
+					// prevents multiple invoke by OR EPOLLONESHOT
+					ev.events = EPOLLET|EPOLLIN;
 					ev.data.fd = fd_in;
 					epoll_ctl(fde, EPOLL_CTL_ADD, fd_in, &ev);
 				}
 			} else {
+#ifdef _DEBUG
+				fprintf(stdout, "Events %d,fd%d: ", evnts[i].events,evnts[i].data.fd);
+#endif
 				do_with_fd(evnts[i].data.fd);
 			}
 		}

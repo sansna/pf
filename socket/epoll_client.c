@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>
 
 #define M 100
 pthread_t tid[M];
@@ -15,7 +16,9 @@ void *pfunc(void *arg) {
 		perror("socket");
 	pthread_t ltid = pthread_self();
 	int i = 0;
-	char buf[20];
+	char buf[20],buf2[20];
+	int ret = 0;
+
 	fcntl(fd, F_SETFL, O_NONBLOCK);
 	inet_aton("127.0.0.1", &sock.sin_addr);
 	sock.sin_family = AF_INET;
@@ -28,12 +31,23 @@ void *pfunc(void *arg) {
 	}
 	snprintf(buf, 20, "HelloWorld%d", i);
 	write(fd, buf, strlen(buf));
+	
+	// receiving from server
+	while (-1 == (ret = read(fd, buf2, 20)) && errno == EAGAIN)
+		usleep(10000);
+	fprintf(stdout,"%s\n", buf2);
+
 	//fprintf(stdout,"%s\n", buf);
 
 	//XXX: When you close the fd, a fin is sent over to server
 	// and server side's epoll will prompt for EPOLLIN|EPOLLET event
 	// causing the further read() of 0 byte.
-	close(fd);
+	if (0 == (ret = read(fd, buf2, 20))) {
+#ifdef _DEBUG
+		fprintf(stdout, "received fin\n");
+#endif
+		close(fd);
+	}
 	return NULL;
 }
 

@@ -9,6 +9,7 @@
 
 #define M 100
 #undef _DEBUG
+int epfd;
 int do_with_fd(int fd) {
 	int count = 0;
 	char buf[20];
@@ -28,14 +29,21 @@ int do_with_fd(int fd) {
 #endif
 			break;
 		}
+		write(fd, buf+10, strlen(buf+10));
+
 		fprintf(stdout, "%s length:%d\n", buf,count);
 	}
+
+	// close connection need to first deregister fd
+	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+	close(fd);
 	return 0;
 }
 
 int main() {
 	struct sockaddr_in sock, sock_in;
-	int fd, fd_in, fde = epoll_create(M);
+	int fd, fd_in;
+	epfd = epoll_create(M);
 	struct epoll_event ev, evnts[M+1];
 	int i = 0;
 	uint size;
@@ -49,9 +57,9 @@ int main() {
 	fcntl(fd, F_SETFL, O_NONBLOCK);
 	ev.events = EPOLLIN;
 	ev.data.fd = fd;
-	epoll_ctl(fde, EPOLL_CTL_ADD, fd, &ev);
+	epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev);
 	while (1) {
-		nfds = epoll_wait(fde, evnts, M+1, 400);
+		nfds = epoll_wait(epfd, evnts, M+1, 400);
 		for (i = 0; i < nfds; i++) {
 			if (evnts[i].events & EPOLLERR||
 				evnts[i].events & EPOLLHUP||
@@ -67,7 +75,7 @@ int main() {
 					// prevents multiple invoke by OR EPOLLONESHOT
 					ev.events = EPOLLET|EPOLLIN;
 					ev.data.fd = fd_in;
-					epoll_ctl(fde, EPOLL_CTL_ADD, fd_in, &ev);
+					epoll_ctl(epfd, EPOLL_CTL_ADD, fd_in, &ev);
 				}
 			} else {
 #ifdef _DEBUG

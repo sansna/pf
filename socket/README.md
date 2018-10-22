@@ -24,3 +24,5 @@ connect(fd, sockaddr_ser, sizeof(sockaddr_ser));
 write(fd, buf, sizeofbuf);
 close(fd);
 ```
+Also note shutdown(fd, op); closes the socket one-way. fd is
+still usable for receiving after shutdown.

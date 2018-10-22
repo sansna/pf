@@ -48,6 +48,11 @@ int main() {
 	int i = 0;
 	uint size;
 	int nfds = 0;
+#ifdef _LINGER
+	struct linger lin;
+	lin.l_onoff = 1;
+	lin.l_linger = 0;
+#endif
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	sock.sin_addr.s_addr = INADDR_ANY;
 	sock.sin_family = AF_INET;
@@ -71,6 +76,9 @@ int main() {
 			if (evnts[i].data.fd == fd) {
 				fd_in = accept(fd, (struct sockaddr*)&sock_in, &size);
 				if (fd_in != -1) {
+#ifdef _LINGER
+					setsockopt(fd_in, SOL_SOCKET, SO_LINGER, &lin, sizeof(lin));
+#endif
 					fcntl(fd_in, F_SETFL, fcntl(fd_in, F_GETFL) | O_NONBLOCK);
 					// prevents multiple invoke by OR EPOLLONESHOT
 					ev.events = EPOLLET|EPOLLIN;

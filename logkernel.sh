@@ -20,9 +20,9 @@ recover() {
     echo 0 > /sys/kernel/debug/tracing/max_graph_depth
     echo 1 > /sys/kernel/debug/tracing/options/funcgraph-irqs
 }
+[ `whoami|grep root|wc -l` -eq 0 ] && echo Must be root! && exit
 [ "x$1" == "x-help" ] && usage && exit
 [ "x$2" == "x-r" ] && recover $3 && exit
-echo Must be root!
 (`pwd`/logkernel.sh $1 -r $$ &)
 echo 0 > /sys/kernel/debug/tracing/tracing_on
 echo $$ > /sys/kernel/debug/tracing/set_ftrace_pid
